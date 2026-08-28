@@ -30,6 +30,12 @@ void load(ice::Config& cfg) {
     cfg.fan_curve[i].rpm = (uint16_t)prefs.getUShort(key, cfg.fan_curve[i].rpm);
   }
   ice::config_sanitize(cfg);
+  prefs.getString("ws", cfg.wifi_ssid, sizeof(cfg.wifi_ssid));
+  prefs.getString("wp", cfg.wifi_pass, sizeof(cfg.wifi_pass));
+  prefs.getString("mh", cfg.mqtt_host, sizeof(cfg.mqtt_host));
+  cfg.mqtt_port = prefs.getUShort("mp", cfg.mqtt_port);
+  prefs.getString("mu", cfg.mqtt_user, sizeof(cfg.mqtt_user));
+  prefs.getString("mpw", cfg.mqtt_pass, sizeof(cfg.mqtt_pass));
 }
 
 void save(const ice::Config& cfg) {
@@ -49,6 +55,12 @@ void save(const ice::Config& cfg) {
     snprintf(key, sizeof(key), "c%ur", i);
     prefs.putUShort(key, cfg.fan_curve[i].rpm);
   }
+  prefs.putString("ws", cfg.wifi_ssid);
+  prefs.putString("wp", cfg.wifi_pass);
+  prefs.putString("mh", cfg.mqtt_host);
+  prefs.putUShort("mp", cfg.mqtt_port);
+  prefs.putString("mu", cfg.mqtt_user);
+  prefs.putString("mpw", cfg.mqtt_pass);
 }
 
 }  // namespace persist

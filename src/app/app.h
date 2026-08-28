@@ -26,6 +26,8 @@ void app_knob_set_target(int16_t target_10);
 void app_set_knob_active(bool active);
 void app_set_cooling(bool on);
 void app_set_fan_loop(uint8_t mode);
+void app_set_wifi_config(const char* ssid, const char* pass);
+void app_set_mqtt_config(const char* host, uint16_t port, const char* user, const char* pass);
 
 // ---- BLE 命令（按协议 v1.1 校验/钳位，回写 cmd_ack）----
 void app_apply_command_frame(const uint8_t* data, size_t len);

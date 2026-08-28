@@ -49,6 +49,13 @@ struct Config {
   FanCurvePoint fan_curve[FAN_CURVE_POINTS] = {
       {350, 800}, {450, 1500}, {550, 2600}, {650, 4200}};
   uint32_t serial = 1;
+  // ---- 联网（远程）配置 ----
+  char wifi_ssid[33] = "";
+  char wifi_pass[65] = "";
+  char mqtt_host[65] = "";
+  uint16_t mqtt_port = 1883;
+  char mqtt_user[33] = "";
+  char mqtt_pass[33] = "";
 };
 
 // ---- 遥测状态位（协议 §3）----

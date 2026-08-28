@@ -3,6 +3,7 @@
 #include "app.h"
 #include <Arduino.h>
 #include <limits.h>
+#include <cstring>
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 
@@ -122,6 +123,31 @@ void app_set_fan_loop(uint8_t mode) {
     g_cfg_changed_ms = (uint32_t)millis();
     g_tel_dirty = true;
   }
+  unlock();
+}
+
+void app_set_wifi_config(const char* ssid, const char* pass) {
+  lock();
+  strncpy(g_cfg.wifi_ssid, ssid ? ssid : "", sizeof(g_cfg.wifi_ssid) - 1);
+  g_cfg.wifi_ssid[sizeof(g_cfg.wifi_ssid) - 1] = '\0';
+  strncpy(g_cfg.wifi_pass, pass ? pass : "", sizeof(g_cfg.wifi_pass) - 1);
+  g_cfg.wifi_pass[sizeof(g_cfg.wifi_pass) - 1] = '\0';
+  g_cfg_dirty = true;
+  g_cfg_changed_ms = (uint32_t)millis();
+  unlock();
+}
+
+void app_set_mqtt_config(const char* host, uint16_t port, const char* user, const char* pass) {
+  lock();
+  strncpy(g_cfg.mqtt_host, host ? host : "", sizeof(g_cfg.mqtt_host) - 1);
+  g_cfg.mqtt_host[sizeof(g_cfg.mqtt_host) - 1] = '\0';
+  g_cfg.mqtt_port = port ? port : 1883;
+  strncpy(g_cfg.mqtt_user, user ? user : "", sizeof(g_cfg.mqtt_user) - 1);
+  g_cfg.mqtt_user[sizeof(g_cfg.mqtt_user) - 1] = '\0';
+  strncpy(g_cfg.mqtt_pass, pass ? pass : "", sizeof(g_cfg.mqtt_pass) - 1);
+  g_cfg.mqtt_pass[sizeof(g_cfg.mqtt_pass) - 1] = '\0';
+  g_cfg_dirty = true;
+  g_cfg_changed_ms = (uint32_t)millis();
   unlock();
 }
 
