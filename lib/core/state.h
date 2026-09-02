@@ -27,6 +27,14 @@ constexpr float V_OVER_V = 24.0f;              // 过压保护（V）
 constexpr float POWER_LIMIT_W = 70.0f;         // 60W + 裕量
 constexpr float USB_PD_VOLT_THRESHOLD = 14.0f; // ≥此电压视为 USB-PD(20V)，否则 12V DC
 
+// ---- 供电能力（协议 §3.5 FFB5.supply_max_power）----
+// 各供电方式下允许的最大制冷功率（W），与硬件选型/协商结果对应，可按实际调整。
+constexpr float SUPPLY_PD_MAX_W = 65.0f;     // USB-PD 20V/3.25A → 65W
+constexpr float SUPPLY_QC_MAX_W = 18.0f;     // QC 9V/2A（QC3.0 典型 18W）
+constexpr float SUPPLY_DC12_MAX_W = 60.0f;   // 12V DC 点烟器（≈制冷片全功率）
+constexpr float SUPPLY_USB5_MAX_W = 10.0f;   // USB 5V/2A 普通充电
+constexpr float PELTIER_FULL_POWER_W = 60.0f; // 制冷片 100% 占空比功率（12V 母线）
+
 // ---- 折线断点（默认）----
 struct FanCurvePoint {
   int16_t temp_10;   // 0.1℃
@@ -79,6 +87,15 @@ enum AlarmCode : uint8_t {
   AL_FAN_STALL = 6,
 };
 
+// ---- 供电协议类型（协议 §3.5 FFB5.supply_protocol）----
+enum SupplyProtocol : uint8_t {
+  SP_PD = 0,       // USB-PD
+  SP_QC = 1,       // QC
+  SP_DC12 = 2,     // 12V DC 点烟器
+  SP_USB5 = 3,     // USB 5V（无协议）
+  SP_UNKNOWN = 4,  // 未知 / 其他
+};
+
 struct Telemetry {
   uint8_t state_bits = 0;
   int16_t cabinet_temp_10 = 0;
@@ -99,6 +116,9 @@ struct Telemetry {
   uint8_t fan_duty = 0;
   uint8_t cmd_ack = 0;
   uint16_t uptime_s = 0;
+  // ---- FFB5 供电信息 ----
+  uint8_t supply_protocol = SP_UNKNOWN;  // 偏移 14
+  uint16_t supply_max_power_w10 = 0;     // 偏移 16–17（0.1W）
 };
 
 // ---- 工具 ----

@@ -55,10 +55,9 @@ size_t pack_telemetry_ext(const Telemetry& t, uint8_t* out) {
   out[10] = t.fan_duty;
   out[11] = t.cmd_ack;
   put_le16(out + 12, t.uptime_s);
-  out[14] = 0;
+  out[14] = t.supply_protocol;
   out[15] = 0;
-  out[16] = 0;
-  out[17] = 0;
+  put_le16(out + 16, t.supply_max_power_w10);
   put_le16(out + 18, crc16_modbus(out, 18));
   return 20;
 }

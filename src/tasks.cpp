@@ -19,6 +19,7 @@
 #include "control.h"
 #include "fan.h"
 #include "state.h"
+#include "supply.h"
 #include <math.h>
 #include <cstring>
 #include <cstdlib>
@@ -65,6 +66,11 @@ void task_control(void*) {
     in.cooling_enable = s.cfg.cooling_enable;
     in.usb_pd = in.voltage >= ice::USB_PD_VOLT_THRESHOLD;
     in.knob_pressed = s.knob_active;
+
+    // ---- 供电识别与制冷功率约束（协议 v1.2）----
+    ice::SupplyInfo si = ice::detect_supply(in.voltage, SUPPLY_DETECT_MODE);
+    app_set_supply(si.protocol, (uint16_t)lroundf(si.max_power_w * 10.0f));
+    in.max_peltier_pwm = ice::pwm_limit_from_power(si.max_power_w);
 
     ice::ControlOutputs out;
     loop.update(in, 0.1f, out);

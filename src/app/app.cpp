@@ -83,6 +83,16 @@ void app_set_fan(uint8_t duty, uint16_t target_rpm, uint16_t rpm, uint8_t mode) 
   unlock();
 }
 
+void app_set_supply(uint8_t protocol, uint16_t max_power_w10) {
+  lock();
+  if (g_tel.supply_protocol != protocol || g_tel.supply_max_power_w10 != max_power_w10) {
+    g_tel.supply_protocol = protocol;
+    g_tel.supply_max_power_w10 = max_power_w10;
+    g_tel_dirty = true;
+  }
+  unlock();
+}
+
 void app_knob_set_target(int16_t target_10) {
   lock();
   int16_t t = ice::clamp_s16(target_10, ice::TARGET_MIN_10, ice::TARGET_MAX_10);

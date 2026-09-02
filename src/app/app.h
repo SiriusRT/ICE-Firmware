@@ -22,6 +22,7 @@ void app_snapshot(AppSnapshot& out);
 void app_set_sensor(const SensorReadings& r);
 void app_set_control(uint8_t pwm, uint8_t state_bits, uint8_t alarm);
 void app_set_fan(uint8_t duty, uint16_t target_rpm, uint16_t rpm, uint8_t mode);
+void app_set_supply(uint8_t protocol, uint16_t max_power_w10);
 void app_knob_set_target(int16_t target_10);
 void app_set_knob_active(bool active);
 void app_set_cooling(bool on);

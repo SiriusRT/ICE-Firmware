@@ -54,6 +54,7 @@ struct ControlInputs {
   bool cooling_enable = false;
   bool usb_pd = true;        // true=USB-PD, false=12V DC
   bool knob_pressed = false;
+  uint8_t max_peltier_pwm = 100;  // 供电能力约束的制冷 PWM 上限（0..100）
 };
 
 struct ControlOutputs {

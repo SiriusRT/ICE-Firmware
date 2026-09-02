@@ -70,6 +70,13 @@ void ControlLoop::update(const ControlInputs& in, float dt, ControlOutputs& out)
     pid_.prev_err = 0;
   }
 
+  // 供电能力约束：限制制冷 PWM 上限并回卷积分，避免 windup
+  if (pwm > in.max_peltier_pwm) {
+    pwm = in.max_peltier_pwm;
+    float err_pid = in.cabinet_temp - in.target_temp;
+    pid_.integral -= err_pid * dt;
+  }
+
   // ---- 状态位 ----
   bits |= (cooling_active ? SB_COOLING : 0);
   bits |= (in.cooling_enable ? SB_FAN : 0);
