@@ -4,6 +4,37 @@
 > 主控：**ESP32-WROOM-32-N4**（双核 Xtensa LX6 @240MHz，520KB SRAM，4MB Flash）
 > 本版架构变更：**移除物理旋钮与 OLED**；TEC 采用 **24V/3A** 功率级；输入 PD3.0 20V。
 
+## MCU 信号命名（Net 命名总表）
+
+**命名规则**：全大写，格式 `被控对象_信号类型缩写`。
+
+| 信号类型缩写 | 含义 | 示例 |
+|---|---|---|
+| CTRL | 控制信号（PWM 调速/调功） | 控制风扇转速 = `FAN_CTRL` |
+| SPD | 转速反馈 | 风扇转速反馈 = `FAN_SPD` |
+| TMP | 温度信号（测温对象） | `CABINET_TMP` |
+| PWR | 电源通断/锁存 | `FAN_PWR`、`PWR_HOLD` |
+
+**接入 MCU 的信号总表**（方向以 MCU 视角，`I/O`=双向）
+
+| 网络名 | 对象 | 信号说明 | 方向 | MCU 引脚 | 电平/说明 |
+|---|---|---|---|---|---|
+| `TEC_CTRL` | TEC | 制冷 PWM 功控（0–100%） | 出 | GPIO25 | 3.3V，15kHz → 低侧 MOS 栅极 |
+| `FAN_CTRL` | 风扇 | 风扇 PWM 转速控制 | 出 | GPIO26 | 3.3V → 74AHCT1G125 缓冲 → 5V PWM |
+| `FAN_SPD` | 风扇 | TACH 转速反馈（2 脉冲/转） | 入 | GPIO27 | 开漏，10k 上拉 3.3V |
+| `FAN_PWR` | 风扇 | 12V 电源闸 MOS 栅极（可选） | 出 | （未分配） | 仅作通断，非调速 |
+| `TEMP_DQ` | 温度 | OneWire 总线（DS18B20 共享） | I/O | GPIO4 | 4.7k 上拉 3.3V；逻辑端点：`CABINET_TMP`/`COLD_TMP`/`HOT_TMP` |
+| `BOARD_TMP` | 主控板 | 板温 NTC（可选） | 入 | GPIO36 | ADC1_CH0，10k 上拉 |
+| `I2C_SDA` | 总线 | INA226(供电监测)+CH224K(PD) | I/O | GPIO21 | 4.7k 上拉 3.3V |
+| `I2C_SCL` | 总线 | 同上 | I/O | GPIO22 | 4.7k 上拉 3.3V |
+| `UART0_TXD` | 下载桥 | ESP32 TX0 → CH340K.RXD | 出 | TX0 | 3.3V |
+| `UART0_RXD` | 下载桥 | CH340K.TXD → ESP32 RX0 | 入 | RX0 | 3.3V |
+| `MCU_EN` | 复位 | CH340K 反相 → EN（自动下载） | 入 | EN | 10k 上拉，复位有效低 |
+| `BOOT_CTRL` | 启动 | CH340K 反相 → GPIO0 | 入 | GPIO0 | 10k 上拉，下载模式选择 |
+| `PWR_HOLD` | 电源 | 软关机锁存 P-MOS（预留） | 出 | GPIO13 | 拉高维持供电 |
+
+> DS18B20 逻辑端点（同一 `TEMP_DQ` 总线，固件索引）：`CABINET_TMP`=0 柜内、`COLD_TMP`=2 冷侧、`HOT_TMP`=3 热侧；柜内第二路可选（索引 1）。
+
 ---
 
 ## 0. 架构定稿（v2.0 变更记录）
